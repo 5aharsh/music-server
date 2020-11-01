@@ -1,0 +1,20 @@
+{
+  "name": "music-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "server": "node ./main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "server"
+  ],
+  "author": "\"Saharsh Anand\"",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "music-metadata": "^7.4.1"
+  }
+}
