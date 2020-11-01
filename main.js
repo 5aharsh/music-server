@@ -1,5 +1,5 @@
 const express = require("express");
-const musics = require("../data/musics.json");
+const musics = require("./data/musics.json");
 const path = require("path");
 const cors = require("cors");
 const { resolve } = require("path");
@@ -51,7 +51,7 @@ server.get("/preview/:name", (req, res, next) => {
 
 server.get("/crawl", function (req, res) {
   (async () => {
-    location = req.query.loc
+    location = req.query.loc!=null?req.query.loc:'/'
     console.log(location)
     var result = [];
     for await (const f of getFiles(location)) {
