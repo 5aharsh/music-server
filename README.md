@@ -25,3 +25,5 @@ node ./main.js
 `/data/{filename}` - Returns files present in data folder. Used to return index data as API or preview images for musics in `./data/preview/`.
 
 `/crawl` or `/crawl?loc={location}` - Crawls the specified directory `{location}` (root `/` if not mentioned) to find and return all audio files. Works asynchronously with proper promises. Indexing strat is still low quality.
+
+`/parse?loc={filename}` - Parse and return metadata for specified file

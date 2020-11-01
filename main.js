@@ -1,31 +1,14 @@
-const express = require("express");
-const musics = require("./data/musics.json");
-const path = require("path");
-const cors = require("cors");
-const { resolve } = require("path");
-const { readdir } = require("fs").promises;
+const express = require("express")
+const musics = require("./data/musics.json")
+const path = require("path")
+const cors = require("cors")
 const fs = require("fs")
 const mm = require('music-metadata')
+const utils = require('./script/utils')
 
-var server = express();
+var server = express()
 
-server.use(cors());
-
-async function* getFiles(dir) {
-  try {
-    const dirents = await readdir(dir, { withFileTypes: true });
-    for (const dirent of dirents) {
-      const res = resolve(dir, dirent.name);
-      if (dirent.isDirectory()) {
-        yield* getFiles(res);
-      } else {
-        yield res;
-      }
-    }
-  } catch (error){
-    console.error(error);
-  }
-}
+server.use(cors())
 
 server.get("/file/:file", (req, res, next) => {
   var file = req.params.file;
@@ -37,41 +20,42 @@ server.get("/file/:file", (req, res, next) => {
     res.status(500);
     return res;
   }
-});
+})
 
 server.get("/data/:name", (req, res, next) => {
   var name = req.params.name;
   res.sendFile(path.join(__dirname, "../data", name));
-});
+})
 
 server.get("/preview/:name", (req, res, next) => {
   var name = req.params.name;
   res.sendFile(path.join(__dirname, "../data/preview", name));
-});
+})
 
 server.get("/crawl", function (req, res) {
   (async () => {
     location = req.query.loc!=null?req.query.loc:'/'
     console.log(location)
     var result = [];
-    for await (const f of getFiles(location)) {
-      if (
-        f.toLowerCase().endsWith(".mp3")  ||
-        f.toLowerCase().endsWith(".m4a")  ||
-        f.toLowerCase().endsWith(".flac") ||
-        f.toLowerCase().endsWith(".aac")  ||
-        f.toLowerCase().endsWith(".mp4")  ||
-        f.toLowerCase().endsWith(".wav")  ||
-        f.toLowerCase().endsWith(".wma")  ||
-        f.toLowerCase().endsWith(".ogg")
-      ) {
+    for await (const f of utils.getFiles(location)) {
+      if (utils.acceptedAudio(f)) {
         console.log(f)
-        result.push(f)
+        result.push(utils.hashCode(f))
       }
     }
     res.send(result);
-  })();
-});
+  })()
+})
+
+server.get("/parse", function (req, res) {
+    console.log(req.query.loc)
+    mm.parseFile(path.join(req.query.loc))
+    .then( 
+        (metadata) => res.send(metadata)
+    ).catch(
+        (err) => console.error(err.message)
+    )
+})
 
 console.log("Listening to port 3000...");
 server.listen(3000);
